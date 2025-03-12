@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
+import {
+  CameraPerspective,
+  type CameraPosition,
+  type DisplayOptions,
+  type NavigationController,
+  type NavigationViewController,
+  type RoutingOptions,
+  TravelMode,
+  type Waypoint,
+} from '@googlemaps/react-native-navigation-sdk';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -24,16 +34,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import {
-  CameraPerspective,
-  type NavigationViewController,
-  type RoutingOptions,
-  TravelMode,
-  type Waypoint,
-  type CameraPosition,
-  type NavigationController,
-  type DisplayOptions,
-} from '@googlemaps/react-native-navigation-sdk';
 import SelectDropdown from 'react-native-select-dropdown';
 
 import styles from '../styles';
@@ -84,7 +84,6 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
     }
   };
 
-  // single destination:
   const initWaypoint = async () => {
     if (!latitude.trim() || !longitude.trim()) {
       Alert.alert('Set lat lng values first');
