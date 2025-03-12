@@ -90,6 +90,7 @@ const AutoSuggestInput = React.forwardRef<TextInput, Props>((props, ref) => {
     }
     return (
       <FlatList
+        scrollEnabled={false}
         data={suggestions}
         keyExtractor={item => `${item.id}`}
         renderItem={({ item }) => {
