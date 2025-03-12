@@ -2,23 +2,23 @@ import type { LatLng } from './LatLng';
 import type { Location } from './Location';
 
 export interface Route {
-  legs: Leg[];
-  distanceMeters: number;
-  duration: string;
-  staticDuration: string;
-  polyline: Polyline;
-  description: string;
-  warnings: string[];
-  viewport: Viewport;
+  legs?: Leg[];
+  distanceMeters?: number;
+  duration?: string;
+  staticDuration?: string;
+  polyline?: Polyline;
+  description?: string;
+  warnings?: string[];
+  viewport?: Viewport;
   travelAdvisory: TravelAdvisory;
-  localizedValues: {
+  localizedValues?: {
     distance: Distance;
     duration: Duration;
     staticDuration: Duration;
   };
   routeToken: string;
-  routeLabels: string[];
-  polylineDetails: PolylineDetails;
+  routeLabels?: string[];
+  polylineDetails?: PolylineDetails;
 }
 
 interface Leg {

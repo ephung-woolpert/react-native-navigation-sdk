@@ -2,10 +2,6 @@ import Config from 'react-native-config';
 import type { Route } from '../types/Route';
 import type { RouteTokenParams } from '../types/RouteTokenParams';
 
-interface RouteResponse {
-  routes: Route[];
-}
-
 const createRequestURL = (
   url: string,
   params: Record<string, string | number | boolean | object>
@@ -34,7 +30,6 @@ const fetchGoogleRoutesApi = <T, B>(
   const url = createRequestURL(`https://routes.googleapis.com/${endpoint}`, {
     key: API_KEY,
   });
-  console.debug('fetchGoogleRoutesApi: url:', url);
   return fetch(url, {
     method: method,
     headers,
@@ -46,14 +41,19 @@ const fetchGoogleRoutesApi = <T, B>(
     });
 };
 
-const generateToken = ({
+const generateRoutes = ({
   origin,
   destination,
 }: {
   origin: RouteTokenParams['origin'];
   destination: RouteTokenParams['destination'];
-}): Promise<RouteResponse> => {
-  return fetchGoogleRoutesApi<RouteResponse, RouteTokenParams>(
+}) => {
+  return fetchGoogleRoutesApi<
+    {
+      routes: Route[];
+    },
+    RouteTokenParams
+  >(
     'directions/v2:computeRoutes',
     {
       origin,
@@ -92,11 +92,11 @@ const generateToken = ({
 };
 
 const GoogleRoutesApi = {
-  generateToken,
+  generateRoutes,
 };
 
 // // Testing: Example usage to generate a route token
-// GoogleRoutesApi.generateToken({
+// GoogleRoutesApi.generateRoutes({
 //   origin: {
 //     location: {
 //       latLng: {
