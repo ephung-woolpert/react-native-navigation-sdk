@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
+import {
+  CameraPerspective,
+  type CameraPosition,
+  type DisplayOptions,
+  type NavigationController,
+  type NavigationViewController,
+  type RoutingOptions,
+  TravelMode,
+  type Waypoint,
+} from '@googlemaps/react-native-navigation-sdk';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -24,18 +34,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import {
-  CameraPerspective,
-  type NavigationViewController,
-  type RoutingOptions,
-  TravelMode,
-  type Waypoint,
-  type CameraPosition,
-  type NavigationController,
-  type DisplayOptions,
-} from '@googlemaps/react-native-navigation-sdk';
 import SelectDropdown from 'react-native-select-dropdown';
 
+import AutoSuggestInput from '../screens/GoogleAutocompleteScreen/components/AutoSuggestInput/AutoSuggestInput';
+import GoogleMapsApi from '../screens/GoogleAutocompleteScreen/services/GoogleMapsApi';
+import GoogleRoutesApi from '../screens/GoogleAutocompleteScreen/services/GoogleRoutesApi';
 import styles from '../styles';
 
 export interface NavigationControlsProps {
@@ -84,7 +87,6 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
     }
   };
 
-  // single destination:
   const initWaypoint = async () => {
     if (!latitude.trim() || !longitude.trim()) {
       Alert.alert('Set lat lng values first');
@@ -114,6 +116,67 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
       waypoint,
       routingOptions,
       displayOptions
+    );
+  };
+
+  const initWaypointWithRouteToken = async () => {
+    // if (!latitude.trim() || !longitude.trim()) {
+    //   Alert.alert('Set lat lng values first');
+    //   return;
+    // }
+    const waypoint: Waypoint = {
+      title: 'Town hall',
+      position: {
+        lat: Number(latitude),
+        lng: Number(longitude),
+      },
+    };
+
+    const routingOptions: RoutingOptions = {
+      travelMode: TravelMode.DRIVING,
+      avoidFerries: true,
+      avoidTolls: false,
+    };
+
+    const displayOptions: DisplayOptions = {
+      showDestinationMarkers: true,
+      showStopSigns: true,
+      showTrafficLights: true,
+    };
+
+    const { routes = [] } = await GoogleRoutesApi.generateRoutes({
+      origin: {
+        location: {
+          latLng: {
+            latitude: 41.8756719,
+            longitude: -87.62434689999999,
+          },
+        },
+      },
+      destination: {
+        location: {
+          latLng: {
+            latitude: Number(latitude),
+            longitude: Number(longitude),
+          },
+        },
+      },
+    });
+
+    console.debug('routes:', routes);
+
+    const token = routes[0]?.routeToken;
+    console.debug('routeToken:', token);
+
+    if (!token) {
+      console.error('[navigationControls] No route token found');
+      return;
+    }
+    navigationController.setDestinations(
+      [waypoint],
+      routingOptions,
+      displayOptions,
+      token
     );
   };
 
@@ -328,6 +391,15 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
   return (
     <View>
       <Text>Target</Text>
+      <AutoSuggestInput
+        onPress={async item => {
+          // set target lat lng
+          const result = await GoogleMapsApi.getDetailFromPlaceId(item.id);
+          onLatChanged(result.geometry.location.lat.toString());
+          onLngChanged(result.geometry.location.lng.toString());
+        }}
+        location="41.8781,-87.6298"
+      />
       <TextInput
         style={styles.input}
         onChangeText={onLatChanged}
@@ -353,6 +425,10 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
         onPress={simulateLocation}
       />
       <Button title="Set target as Destination" onPress={initWaypoint} />
+      <Button
+        title="Set target as Destination with Route Token"
+        onPress={initWaypointWithRouteToken}
+      />
       <View style={styles.controlButtonGap} />
       <Button title="Multiple Destination" onPress={initWaypoints} />
       <Button title="Dispose navigation" onPress={disposeNavigation} />

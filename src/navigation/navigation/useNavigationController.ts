@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
+import { useMemo } from 'react';
 import { NativeModules, Platform } from 'react-native';
 import { useModuleListeners, type LatLng } from '../../shared';
+import { getRouteStatusFromStringValue } from '../navigationView';
 import type {
-  Waypoint,
   AudioGuidance,
   RouteSegment,
   TimeAndDistance,
+  Waypoint,
 } from '../types';
 import {
+  TaskRemovedBehavior,
+  type DisplayOptions,
+  type LocationSimulationOptions,
   type NavigationCallbacks,
-  type TermsAndConditionsDialogOptions,
   type NavigationController,
   type RoutingOptions,
   type SpeedAlertOptions,
-  type LocationSimulationOptions,
-  TaskRemovedBehavior,
-  type DisplayOptions,
+  type TermsAndConditionsDialogOptions,
 } from './types';
-import { getRouteStatusFromStringValue } from '../navigationView';
-import { useMemo } from 'react';
 
 const { NavModule, NavEventDispatcher } = NativeModules;
 const androidBridge: string = 'NavJavascriptBridge';
@@ -92,27 +92,31 @@ export const useNavigationController = (
         await NavModule.cleanup();
       },
 
-      setDestination: async (
+      setDestination: (
         waypoint: Waypoint,
         routingOptions?: RoutingOptions,
-        displayOptions?: DisplayOptions
+        displayOptions?: DisplayOptions,
+        routeToken?: string
       ) => {
-        return await NavModule.setDestination(
+        return NavModule.setDestination(
           waypoint,
           routingOptions,
-          displayOptions
+          displayOptions,
+          routeToken
         );
       },
 
       setDestinations: async (
         waypoints: Waypoint[],
         routingOptions?: RoutingOptions,
-        displayOptions?: DisplayOptions
+        displayOptions?: DisplayOptions,
+        routeToken?: string
       ) => {
         return await NavModule.setDestinations(
           waypoints,
           routingOptions,
-          displayOptions
+          displayOptions,
+          routeToken
         );
       },
 
